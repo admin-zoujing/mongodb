@@ -11,13 +11,6 @@ mongodb基本操作
            删除zoujing用户：>use zoujing >db.dropUser('zoujing'); 
            创建管理员用户： >use admin   >db.createUser({user:"admin",pwd:"Adminqwe",roles:["root"]});
 
-
-创建另一个用户"myuser": > db.createUser({user:"myuser",pwd:"myuser",roles:[{role:"readWrite",db:"mydb"}]})  
-    
-增删角色：
-         #授予角色：db.grantRolesToUser("myuser",[{role:"dbOwner",db:"mydb"}])  
-         #取消角色：db.revokeRolesFromUser("myuser",[{role:"readWrite",db:"mydb"}])  
-
 3、MongoDB 查看数据库: >show dbs                     
            创建数据库：>use zoujing                              
            删除数据库: >use zoujing   >db.dropDatabase()
@@ -47,4 +40,4 @@ MongoDB 与 RDBMS Where 语句比较
 
 MongoDB AND条件         >db.runoob.find({"by":"菜鸟教程", "title":"MongoDB 教程"}).pretty()
 MongoDB OR条件          >db.runoob.find({$or:[{"by":"菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()
-        AND和OR联合使用 >db.runoob.find({"likes": {$gt:50}, $or: [{"by": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()
+MongoDB AND和OR联合使用 >db.runoob.find({"likes": {$gt:50}, $or: [{"by": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()
