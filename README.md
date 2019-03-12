@@ -93,13 +93,37 @@ db.col.find({"title":{$type:'string'}})
 
 9、MongoDB Limit与Skip方法
    >db.col.find({},{"title":1,_id:0}).limit(2)
-   >db.col.find({},{"title":1,_id:0}).limit(1).skip(1)
+   >db.col.find({},{"title":1,_id:0}).limit(1).skip(1)  #skip影响效率,不要轻易使用
 
 10、MongoDB 排序(1为升序，-1是降序)
    >db.col.find({},{"title":1,_id:0}).sort({"likes":-1})
    skip(), limilt(), sort()三个放在一起执行的时候，执行的顺序是先 sort(), 然后是 skip()，最后是显示的 limit()
 
-11、MongoDB 索引
+11、MongoDB 聚合
+    计算总和：>db.mycol.aggregate([{$group:{_id:"$by_user",num_tutorial:{$sum:"$likes"}}}])
+    计算平均值：>db.mycol.aggregate([{$group:{_id:"$by_user",num_tutorial:{$avg:"$likes"}}}])
+    获取集合中所有文档对应值得最小值：            db.mycol.aggregate([{$group:{_id:"$by_user",num_tutorial:{$min:"$likes"}}}])
+    获取集合中所有文档对应值得最大值：            db.mycol.aggregate([{$group:{_id:"$by_user",num_tutorial:{$max:"$likes"}}}])
+    在结果文档中插入值到一个数组中：              db.mycol.aggregate([{$group:{_id:"$by_user",url:{$push:"$url"}}}])
+    在结果文档中插入值到一个数组中，但不创建副本：db.mycol.aggregate([{$group:{_id:"$by_user",url:{$addToSet:"$url"}}}])
+    根据资源文档的排序获取第一个文档数据：        db.mycol.aggregate([{$group:{_id:"$by_user",first_url:{$first:"$url"}}}])
+    根据资源文档的排序获取最后一个文档数据：      db.mycol.aggregate([{$group:{_id:"$by_user",last_url:{$last:"$url"}}}])
+
+    $project：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
+    $match：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。
+    $limit：用来限制MongoDB聚合管道返回的文档数。
+    $skip：在聚合管道中跳过指定数量的文档，并返回余下的文档。
+    $unwind：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
+    $group：将集合中的文档分组，可用于统计结果。
+    $sort：将输入文档排序后输出。
+    $geoNear：输出接近某一地理位置的有序文档。
+
+    $project实例: >db.article.aggregate({$project:{_id:0,title:1,author:1}});
+      $match实例: >db.articles.aggregate([{$match:{score:{$gt:70,$lte:90}}},{$group:{_id:null,count:{$sum:1}}}]);
+       $skip实例: >db.article.aggregate({$skip:5});
+    count()函数很慢,解决方案就是用MongoCursor.Size()方法
+
+12、MongoDB 索引
     创建索引:     >db.col.createIndex({"title":1})
     复合索引:     >db.col.createIndex({"title":1,"description":-1})
 
@@ -107,3 +131,14 @@ db.col.find({"title":{$type:'string'}})
     查看集合索引大小: >db.col.totalIndexSize()
     删除集合所有索引: >db.col.dropIndexes()
     删除集合指定索引: >db.col.dropIndex("索引名称")
+
+13、MongoDB 复制（副本集）
+    #replSet=rs0
+    #设置副本集集群  :>use admin 
+    #>db.runCommand({"replSetInitiate":{"_id":"rs0","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},]}})
+    #>rs.add("192.168.8.51:27017")
+    #查看复制集状态:          >rs.status()        >rs.isMaster()        >rs.conf()
+    #查看从库状态:            >db.printSlaveReplicationInfo()
+    #设置从库可查询:          >db.getMongo().setSlaveOk()  或者 >rs.slaveOk()
+    #删除节点:主节点上面执行：>rs.remove("ip:port")
+    #看数据库连接数:          >db.serverStatus().connections
