@@ -126,4 +126,5 @@ rm -rf $sourceinstall
 #设置从库可查询:          >db.getMongo().setSlaveOk()
 #删除节点:主节点上面执行：>rs.remove("ip:port")
 #看数据库连接数:          >db.serverStatus().connections
+#查看oplog：>use local  >show collections  >db.oplog.rs.find()   >db.printReplicationInfo()
     
