@@ -142,3 +142,12 @@ db.col.find({"title":{$type:'string'}})
     #设置从库可查询:          >db.getMongo().setSlaveOk()  或者 >rs.slaveOk()
     #删除节点:主节点上面执行：>rs.remove("ip:port")
     #看数据库连接数:          >db.serverStatus().connections
+    
+13、MongoDB 数据备份
+    #备份全库：mongodump -u username -p password -h 127.0.0.1:27017 -o db
+    #备份单库：mongodump -u username -p password -h 127.0.0.1:27017 -d dbname -o db
+    #备份集合：mongodump -u username -p password -h 127.0.0.1:27017 -d dbname -c collection -o db
+
+    #恢复全库：mongorestore -u username -p password -h 127.0.0.1:27017 --dir=<directory-name>  
+    #恢复单库：mongorestore -u username -p password -h 127.0.0.1:27017 -d dbname --dir=<directory-name>  
+    #恢复集合：mongorestore -u username -p password -h 127.0.0.1:27017 -d dbname -c collection --dir=<directory-name>  
