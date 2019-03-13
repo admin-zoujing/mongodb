@@ -35,14 +35,10 @@ chown -R mongodb:mongodb /usr/local/mongodb
 #echo 3 > /proc/sys/vm/drop_caches
 cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf <<EOF
 dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
-#journal:
-#enabled: true
-#directoryPerDB: true
-#engine: wiredTiger
-#wiredTiger:
-#engineConfig:
-#cacheSizeGB: 5
-#这个数字是你设置的limit x 50% - 1G,最小1G。
+journal=true
+directoryperdb=true
+#wiredTigerCacheSizeGB=3
+#这个数字是你设置的(limit-1G)*0.5,最小1.5G。
 logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/logs/mongodb.log
 logappend=true
 port=27017
@@ -50,8 +46,8 @@ fork=true
 #auth=true
 bind_ip=0.0.0.0
 #security:authorization: enabled
-#configsvr=true
-#replSet=rs0
+#configsvr=true 
+#replSet=rs0    （2台以上集群）
 maxConns=20000
 EOF
 chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
