@@ -37,6 +37,7 @@ cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf <<EOF
 dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
 journal=true
 directoryperdb=true
+wiredTigerDirectoryForIndexes=true
 #wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
 logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/logs/mongodb.log
@@ -45,7 +46,6 @@ port=27017
 fork=true
 #auth=true
 bind_ip=0.0.0.0
-#security:authorization: enabled
 #configsvr=true 
 #replSet=rs0    （2台以上集群）
 maxConns=20000
