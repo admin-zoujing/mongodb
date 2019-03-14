@@ -47,7 +47,7 @@ fork=true
 #auth=true
 bind_ip=0.0.0.0
 #configsvr=true 
-#replSet=rs0    #（2台以上集群）
+#replSet=rs0    
 maxConns=20000
 EOF
 chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
