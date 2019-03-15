@@ -3,8 +3,8 @@ http://www.runoob.com/mongodb
 mongodb基本操作
 
 1、MongoDB 登录数据库：mongo  
-           关闭数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf --shutdown  
-                      >use admin     >db.shutdownServer()
+           关闭数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf --shutdown    
+                       >use admin >db.shutdownServer()
            开启数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
 
 2、MongoDB 查询zoujing用户: >use admin   >db.system.users.find();
@@ -144,8 +144,9 @@ db.col.find({"title":{$type:'string'}})
     #设置从库可查询:          >db.getMongo().setSlaveOk()  或者 >rs.slaveOk()
     #删除节点:主节点上面执行：>rs.remove("ip:port")
     #看数据库连接数:          >db.serverStatus().connections
+    #查看oplog：>use local  >show collections  >db.oplog.rs.find()   >db.printReplicationInfo()
     
-13、MongoDB 数据备份
+14、MongoDB 数据备份
     #备份全库：mongodump -u username -p password -h 127.0.0.1:27017 -o db
     #备份单库：mongodump -u username -p password -h 127.0.0.1:27017 -d dbname -o db
     #备份集合：mongodump -u username -p password -h 127.0.0.1:27017 -d dbname -c collection -o db
@@ -153,3 +154,193 @@ db.col.find({"title":{$type:'string'}})
     #恢复全库：mongorestore -u username -p password -h 127.0.0.1:27017 --dir=<directory-name>  
     #恢复单库：mongorestore -u username -p password -h 127.0.0.1:27017 -d dbname --dir=<directory-name>  
     #恢复集合：mongorestore -u username -p password -h 127.0.0.1:27017 -d dbname -c collection --dir=<directory-name>  
+
+15、MongoDB 监控
+    # mongostat  mongotop
+
+16、MongoDB 分片
+    #3台服务器上各安装Shard,Config,Route服务
+    主机              IP                 服务及端口
+  Server A      192.168.8.50         mongod shard1_1:27017 
+                                     mongod shard2_1:27018 
+                                     mongod config1:20000 
+                                     mongs1:30000 
+  Server B      192.168.8.51         mongod shard1_2:27017 
+                                     mongod shard2_2:27018 
+                                     mongod config2:20000 
+                                     mongs2:30000 
+  Server C      192.168.5.52         mongod shard1_3:27017 
+                                     mongod shard2_3:27018 
+                                     mongod config3:20000 
+                                     mongs3:30000 
+  #16.1 创建数据目录
+    Server A: mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_1,shard2_1,config}
+              chown -R root:root /usr/local/mongodb/
+    Server B: mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_2,shard2_2,config}
+              chown -R root:root /usr/local/mongodb/
+    Server C：mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_3,shard2_3,config}
+              chown -R root:root /usr/local/mongodb/
+
+              firewall-cmd --permanent --zone=public --add-port=27018/tcp --permanent
+              firewall-cmd --permanent --zone=public --add-port=20000/tcp --permanent
+              firewall-cmd --permanent --zone=public --add-port=30000/tcp --permanent
+              firewall-cmd --permanent --query-port=27018/tcp
+              firewall-cmd --permanent --query-port=20000/tcp
+              firewall-cmd --permanent --query-port=30000/tcp
+              firewall-cmd --reload
+
+
+  #16.2 配置shard1所用到的Replica Sets 
+    Server A: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1/shard1_1.log --logappend --bind_ip_all --fork  
+    Server B: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_2 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_2/shard1_2.log --logappend --bind_ip_all --fork  
+    Server C：mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_3 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_3/shard1_3.log --logappend --bind_ip_all --fork  
+
+    mongo --port 27017   
+      >use admin 
+      >db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})
+
+  #16.3 配置shard2所用到的Replica Sets 
+    Server A: mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_1/shard2_1.log --logappend --bind_ip_all --fork  
+    Server B: mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_2 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_2/shard2_2.log --logappend --bind_ip_all --fork  
+    Server C：mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_3 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_3/shard2_3.log --logappend --bind_ip_all --fork  
+
+    mongo --port 27018  
+      >use admin 
+      >db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})
+
+  #16.4 配置3台Config Server
+    Server A: mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --logappend --bind_ip_all --fork 
+    Server B: mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --logappend --bind_ip_all --fork 
+    Server C：mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --logappend --bind_ip_all --fork 
+
+    mongo --port 20000
+      >use admin 
+      >db.runCommand({"replSetInitiate":{"_id":"config","members":[{"_id":0,"host":"192.168.8.50:20000"},{"_id":1,"host":"192.168.8.51:20000"},{"_id":2,"host":"192.168.8.52:20000"},]}})    
+
+  #16.5 配置3台Route Process 
+    Server A: mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log --logappend --bind_ip_all --fork 
+    Server B: mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log --logappend --bind_ip_all --fork 
+    Server C：mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log --logappend --bind_ip_all --fork 
+
+  #16.6 配置Shard Cluster 
+    mongo --port 30000 
+      >use admin 
+      >db.runCommand({addshard:"shard1/192.168.8.50:27017,192.168.8.51:27017,192.168.8.52:27017"});  
+      >db.runCommand({addshard:"shard2/192.168.8.50:27018,192.168.8.51:27018,192.168.8.52:27018"});  
+      >db.runCommand({enablesharding:"test" }) 
+      >db.runCommand({shardcollection: "test.users", key: { _id:1 }}) 
+
+  #16.7 验证Sharding正常工作
+    mongo --port 30000 
+      >use test  
+      >for(var i=1;i<=200000;i++) db.users.insert({id:i,addr_1:"Beijing",addr_2:"Shanghai"});   
+      >db.users.stats() 
+
+
+------------------------------------------------------------------------------------------------------------------
+
+                                                      华丽分割
+
+------------------------------------------------------------------------------------------------------------------
+
+创建另一个用户"myuser": > db.createUser({user:"myuser",pwd:"myuser",roles:[{role:"readWrite",db:"mydb"}]})  
+    
+#自定义角色
+    #db.dropRole("testRole")
+    >use mydb  
+    >db.createRole({role:"testRole",privileges:[{resource:{db:"mydb",collection:""},actions:["find"]}],roles:[]})  
+
+#查看角色
+    >use admin  >show collections  >db.system.roles.find();  
+   
+#创建用户并授予角色
+    #db.dropUser("userkk")
+    >use mydb       
+    >db.createUser({ user:"userkk",pwd:"userkk",roles:[{role:"testRole",db:"mydb"}]})  
+
+#给角色添加3个权限："update", "insert", "remove"
+    >use mydb      
+    >db.grantPrivilegesToRole("testRole",[{resource:{db:"mydb",collection:""},actions:["update","insert","remove"]}])             
+ 
+#更新角色roles，同样Privileges也可以更新替换   
+    >use mydb       
+    >db.updateRole("testRole",{ roles:[{ role:"readWrite",db:"mydb"}]},{w:"majority"})    
+
+#增删角色：
+         #授予角色：>db.grantRolesToUser("myuser",[{role:"dbOwner",db:"mydb"}])  
+         #取消角色：>db.revokeRolesFromUser("myuser",[{role:"readWrite",db:"mydb"}])          
+
+
+关于角色，参考官方文档提取总结如下：
+
+角色分类                         角色                   权限及角色（本文大小写可能有些变化，使用时请参考官方文档）
+
+Database User Roles             read	                 CollStats,dbHash,dbStats,find,killCursors,listIndexes,listCollections
+数据库用户角色                  readWrite               CollStats,ConvertToCapped,CreateCollection,DbHash,DbStats,
+                                                        DropCollection,CreateIndex,DropIndex,Emptycapped,Find,
+                                                        Insert,KillCursors,ListIndexes,ListCollections,Remove,
+                                                        RenameCollectionSameDB,update
+Database Administration Roles   dbAdmin                 collStats,dbHash,dbStats,find,killCursors,listIndexes,listCollections,
+数据库管理角色                                          dropCollection 和 createCollection 在 system.profile
+                                dbOwner                 角色：readWrite, dbAdmin,userAdmin
+                                userAdmin               ChangeCustomData,ChangePassword,CreateRole,CreateUser,
+                                                        DropRole,DropUser,GrantRole,RevokeRole,ViewRole,viewUser
+Cluster Administration Roles    clusterAdmin           角色：clusterManager, clusterMonitor, hostManager
+集群管理角色                    clusterManager         AddShard,ApplicationMessage,CleanupOrphaned,FlushRouterConfig,
+                                                       ListShards,RemoveShard,ReplSetConfigure,ReplSetGetStatus,
+                                                       ReplSetStateChange,Resync,
+                                                       EnableSharding,MoveChunk,SplitChunk,splitVector
+                                clusterMonitor         connPoolStats,cursorInfo,getCmdLineOpts,getLog,getParameter,
+                                                       getShardMap,hostInfo,inprog,listDatabases,listShards,netstat,
+                                                       replSetGetStatus,serverStatus,shardingState,top
+                                                       collStats,dbStats,getShardVersion
+                                hostManager            applicationMessage,closeAllDatabases,connPoolSync,cpuProfiler,
+                                                       diagLogging,flushRouterConfig,fsync,invalidateUserCache,killop,
+                                                       logRotate,resync,setParameter,shutdown,touch,unlock
+Backup and Restoration Roles    backup            	   提供在admin数据库mms.backup文档中insert,update权限
+备份和还原角色                                         列出所有数据库：listDatabases
+                                                       列出所有集合索引：listIndexes
+                                                       对以下提供查询操作：find
+                                                       *非系统集合
+                                                       *系统集合：system.indexes, system.namespaces, system.js
+                                                       *集合：admin.system.users 和 admin.system.roles
+                                restore                非系统集合、system.js，admin.system.users 和 admin.system.roles及2.6版本的system.users提供以下权限：
+                                                       collMod,createCollection,createIndex,dropCollection,insert
+                                                       列出所有数据库：listDatabases
+                                                       system.users ：find,remove,update
+All-Database Roles              readAnyDatabase        提供所有数据库中只读权限：read
+跨库角色                                               列出集群所有数据库：listDatabases
+                                readWriteAnyDatabase   提供所有数据库读写权限：readWrite
+                                                       列出集群所有数据库：listDatabases
+                                userAdminAnyDatabase   提供所有用户数据管理权限：userAdmin
+                                                       Cluster：authSchemaUpgrade,invalidateUserCache,listDatabases
+                                                       admin.system.users和admin.system.roles：
+                                                       collStats,dbHash,dbStats,find,killCursors,planCacheRead
+                                                       createIndex,dropIndex
+                                dbAdminAnyDatabase     提供所有数据库管理员权限：dbAdmin
+                                                       列出集群所有数据库：listDatabases
+Superuser Roles                 root                   角色：dbOwner，userAdmin，userAdminAnyDatabase
+                                                       readWriteAnyDatabase, dbAdminAnyDatabase,
+                                                       userAdminAnyDatabase，clusterAdmin
+Internal Role                   __system               集群中对任何数据库采取任何操作
+
+
+数据库用户角色： read：授予User只读数据的权限
+                 readWrite：授予User读写数据的权限
+
+数据库管理角色： dbAdmin：在当前dB中执行管理操作
+                 dbOwner：在当前DB中执行任意操作
+                 userAdmin：在当前DB中管理User
+
+备份和还原角色： backup
+                 restore
+
+跨库角色：       readAnyDatabase：授予在所有数据库上读取数据的权限
+                 readWriteAnyDatabase：授予在所有数据库上读写数据的权限
+                 userAdminAnyDatabase：授予在所有数据库上管理User的权限
+                 dbAdminAnyDatabase：授予管理所有数据库的权限
+
+集群管理角色：   clusterAdmin：授予管理集群的最高权限
+                 clusterManager：授予管理和监控集群的权限
+                 clusterMonitor：授予监控集群的权限，对监控工具具有readonly的权限
+                 hostManager：管理Server
