@@ -2,7 +2,8 @@
 mongodb基本操作
 
 1、MongoDB 登录数据库：mongo  
-           关闭数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf --shutdown    
+           关闭数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf --shutdown  
+                      >use admin     >db.shutdownServer()
            开启数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
 
 2、MongoDB 查询zoujing用户: >use admin   >db.system.users.find();
