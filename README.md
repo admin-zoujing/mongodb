@@ -2,8 +2,8 @@
 mongodb基本操作
 
 1、MongoDB 登录数据库：mongo  
-           关闭数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel62-3.4.5/mongodb.conf --shutdown    
-           开启数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel62-3.4.5/mongodb.conf
+           关闭数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf --shutdown    
+           开启数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
 
 2、MongoDB 查询zoujing用户: >use admin   >db.system.users.find();
            创建zoujing用户: >use zoujing >db.createUser({user:"zoujing",pwd:"123456",roles:[{role:"dbOwner",db:"zoujing"}]});
