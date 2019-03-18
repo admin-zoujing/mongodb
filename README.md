@@ -1,5 +1,5 @@
 图形客户端下载地址：https://robomongo.org/download
-http://www.runoob.com/mongodb
+# http://www.runoob.com/mongodb
 
 mongodb基本操作
 
