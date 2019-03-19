@@ -1,5 +1,5 @@
 图形客户端下载地址：https://robomongo.org/download
-# http://www.runoob.com/mongodb
+http://www.runoob.com/mongodb
 
 mongodb基本操作
 
@@ -192,31 +192,28 @@ db.col.find({"title":{$type:'string'}})
 
 
   #16.2 配置shard1所用到的Replica Sets 
-    Server A: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1/shard1_1.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16--bind_ip_all --fork  
+    Server A: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1/shard1_1.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
     Server B: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_2 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_2/shard1_2.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
     Server C：mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_3 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_3/shard1_3.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
 
-    mongo --port 27017   
-      >use admin 
-      >db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})
+     
+     echo 'db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})' | mongo -p 27017 admin    
 
   #16.3 配置shard2所用到的Replica Sets 
     Server A: mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_1/shard2_1.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
     Server B: mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_2 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_2/shard2_2.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork  
     Server C：mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_3 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_3/shard2_3.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork  
 
-    mongo --port 27018  
-      >use admin 
-      >db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})
+
+    echo 'db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})' | mongo -p 27018 admin
 
   #16.4 配置3台Config Server
     Server A: mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
     Server B: mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
     Server C：mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
 
-    mongo --port 20000
-      >use admin 
-      >db.runCommand({"replSetInitiate":{"_id":"config","members":[{"_id":0,"host":"192.168.8.50:20000"},{"_id":1,"host":"192.168.8.51:20000"},{"_id":2,"host":"192.168.8.52:20000"},]}})    
+
+     echo 'db.runCommand({"replSetInitiate":{"_id":"config","members":[{"_id":0,"host":"192.168.8.50:20000"},{"_id":1,"host":"192.168.8.51:20000"},{"_id":2,"host":"192.168.8.52:20000"},]}})' | mongo -p 20000 admin    
 
   #16.5 配置3台Route Process 
     Server A: mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log --logappend --bind_ip_all --fork 
@@ -224,18 +221,14 @@ db.col.find({"title":{$type:'string'}})
     Server C：mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log --logappend --bind_ip_all --fork 
 
   #16.6 配置Shard Cluster 
-    mongo --port 30000 
-      >use admin 
-      >db.runCommand({addshard:"shard1/192.168.8.50:27017,192.168.8.51:27017,192.168.8.52:27017"});  
-      >db.runCommand({addshard:"shard2/192.168.8.50:27018,192.168.8.51:27018,192.168.8.52:27018"});  
-      >db.runCommand({enablesharding:"test" }) 
-      >db.runCommand({shardcollection: "test.users", key: { _id:1 }}) 
+      echo 'db.runCommand({addshard:"shard1/192.168.8.50:27017,192.168.8.51:27017,192.168.8.52:27017"})' | mongo -p 30000 admin 
+      echo 'db.runCommand({addshard:"shard2/192.168.8.50:27018,192.168.8.51:27018,192.168.8.52:27018"})' | mongo -p 30000 admin 
+      echo 'db.runCommand({enablesharding:"test" })' | mongo -p 30000 admin 
+      echo 'db.runCommand({shardcollection: "test.users", key: { _id:1 }})' | mongo -p 30000 admin 
 
   #16.7 验证Sharding正常工作
-    mongo --port 30000 
-      >use test  
-      >for(var i=1;i<=200000;i++) db.users.insert({id:i,addr_1:"Beijing",addr_2:"Shanghai"});   
-      >db.users.stats() 
+        echo 'for(var i=1;i<=200000;i++) db.users.insert({id:i,addr_1:"Beijing",addr_2:"Shanghai"})' | mongo -p 30000 test
+        echo 'db.users.stats()' | mongo -p 30000 test
 
 
 ------------------------------------------------------------------------------------------------------------------
