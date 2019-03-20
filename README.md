@@ -230,6 +230,9 @@ db.col.find({"title":{$type:'string'}})
         echo 'for(var i=1;i<=200000;i++) db.users.insert({id:i,addr_1:"Beijing",addr_2:"Shanghai"})' | mongo -p 30000 test
         echo 'db.users.stats()' | mongo -p 30000 test
 
+  #16.8 问题
+        非正常关机后，重启无法后台运行，删除锁文件mongod.lock
+        mongos启动卡死，后台启动2个进程，杀死一个就行。kill
 
 ------------------------------------------------------------------------------------------------------------------
 
