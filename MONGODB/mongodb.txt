@@ -235,6 +235,37 @@ db.col.find({"title":{$type:'string'}})
   #16.8 问题
         非正常关机后，重启无法后台运行，删除锁文件mongod.lock
         mongos启动卡死，后台启动2个进程，杀死一个就行。kill
+        #查看shard集群的当前状态：>sh.status()
+        #添加shard服务器至集群:>sh.addShard("config/192.168.8.53:27017")
+
+  #16.9 集群分片需要密码认证
+        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 27017 admin
+        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 27018 admin
+        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 20000 admin
+
+        #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+        #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+        #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+        #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+
+        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+        #chown -R mongodb:mongodb /usr/local/mongodb
+        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+
+        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+
+        #systemctl restart mongodbshard1.service     
+        #systemctl restart mongodbshard2.service 
+        #systemctl restart mongodbconfigsvr.service
+        #systemctl restart mongodbconfigdb.service 
 
 ------------------------------------------------------------------------------------------------------------------
 
@@ -343,3 +374,4 @@ Internal Role                   __system               集群中对任何数据�
                  clusterManager：授予管理和监控集群的权限
                  clusterMonitor：授予监控集群的权限，对监控工具具有readonly的权限
                  hostManager：管理Server
+
