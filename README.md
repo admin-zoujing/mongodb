@@ -12,7 +12,7 @@ mongodb基本操作
            创建zoujing用户: >use zoujing >db.createUser({user:"zoujing",pwd:"123456",roles:[{role:"dbOwner",db:"zoujing"}]});
            修改zoujing密码: >use zoujing >db.changeUserPassword('zoujing','123');
            删除zoujing用户：>use zoujing >db.dropUser('zoujing'); 
-           创建管理员用户： >use admin   >db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"}]})
+           创建管理员用户： >use admin   >db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]});
            >db.auth('admin','Adminqwe123') 
 
 3、MongoDB 查看数据库: >show dbs                     
@@ -254,9 +254,9 @@ db.col.find({"title":{$type:'string'}})
         #添加shard服务器至集群:>sh.addShard("config/192.168.8.53:27017")
 
   #16.9 集群分片需要密码认证
-        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 27017 admin
-        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 27018 admin
-        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 20000 admin
+        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27017 admin
+        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27018 admin
+        #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 20000 admin
 
         #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
         #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
