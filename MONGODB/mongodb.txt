@@ -261,7 +261,7 @@ db.col.find({"title":{$type:'string'}})
         #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
         #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
         #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
-        #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+        #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.52:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
 
         #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
         #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
@@ -277,10 +277,18 @@ db.col.find({"title":{$type:'string'}})
         #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
         #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
 
-        #systemctl restart mongodbshard1.service     
-        #systemctl restart mongodbshard2.service 
-        #systemctl restart mongodbconfigsvr.service
-        #systemctl restart mongodbconfigdb.service 
+        #关闭集群:路由结点、分片结点、配置结点顺序
+        #systemctl stop mongodbconfigdb.service 
+        #systemctl stop mongodbshard1.service     
+        #systemctl stop mongodbshard2.service     
+        #systemctl stop mongodbconfigsvr.service
+
+        #重新启动集群
+        #systemctl start mongodbconfigsvr.service
+        #systemctl start mongodbshard1.service     
+        #systemctl start mongodbshard2.service     
+        #systemctl start mongodbconfigdb.service 
+
 
 ------------------------------------------------------------------------------------------------------------------
 
@@ -389,4 +397,5 @@ Internal Role                   __system               集群中对任何数据�
                  clusterManager：授予管理和监控集群的权限
                  clusterMonitor：授予监控集群的权限，对监控工具具有readonly的权限
                  hostManager：管理Server
+
 
