@@ -688,9 +688,9 @@ EOF
   #添加shard服务器至集群:>sh.addShard("config/192.168.8.53:27017")
 
   #16.9 集群分片需要密码认证
-#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 27017 admin
-#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 27018 admin
-#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["clusterAdmin"]})' | mongo --port 20000 admin
+#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27017 admin
+#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27018 admin
+#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 20000 admin
 
 
 #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
