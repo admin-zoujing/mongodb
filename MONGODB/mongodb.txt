@@ -398,4 +398,3 @@ Internal Role                   __system               集群中对任何数据�
                  clusterMonitor：授予监控集群的权限，对监控工具具有readonly的权限
                  hostManager：管理Server
 
-
