@@ -103,7 +103,7 @@ sleep 10
 cd
 rm -rf $sourceinstall
 
-echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"}]})' | mongo admin
+echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo admin
 
 # echo 'db.dropUser("admin")' | mongo admin
 sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
