@@ -12,7 +12,8 @@ mongodb基本操作
            创建zoujing用户: >use zoujing >db.createUser({user:"zoujing",pwd:"123456",roles:[{role:"dbOwner",db:"zoujing"}]});
            修改zoujing密码: >use zoujing >db.changeUserPassword('zoujing','123');
            删除zoujing用户：>use zoujing >db.dropUser('zoujing'); 
-           创建管理员用户： >use admin   >db.createUser({user:"admin",pwd:"Adminqwe",roles:["root"]});
+           创建管理员用户： >use admin   >db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"}]})
+           >db.auth('admin','Adminqwe123') 
 
 3、MongoDB 查看数据库: >show dbs                     
            创建数据库：>use zoujing                              
@@ -136,6 +137,20 @@ db.col.find({"title":{$type:'string'}})
     删除集合指定索引: >db.col.dropIndex("索引名称")
 
 13、MongoDB 复制（副本集）
+    #设置副本集集群密码认证:
+    #sed -i 's|#replSet=rs0 |replSet=rs0 |' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+    #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+    #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+
+    #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+    #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+    #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+    #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+    #chown -R mongodb:mongodb /usr/local/mongodb
+    #systemctl restart mongodb.service    
+    #echo 'db.runCommand({"replSetInitiate":{"_id":"rs0","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},]}})' | mongo -u admin -p Adminqwe123 --port 27017 admin
+
+
     #replSet=rs0
     #设置副本集集群  :>use admin 
     #>db.runCommand({"replSetInitiate":{"_id":"rs0","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},]}})
