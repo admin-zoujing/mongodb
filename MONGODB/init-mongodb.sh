@@ -1,6 +1,7 @@
 #!/bin/bash
 #安装centos7+mongodb脚本 
 #图形客户端下载地址：https://robomongo.org/download
+#http://www.runoob.com/mongodb
 sourceinstall=/usr/local/src/mongodb
 chmod -R 777 $sourceinstall
 
@@ -44,10 +45,11 @@ logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/logs/mongodb.log
 logappend=true
 port=27017
 fork=true
-#auth=true
 bind_ip=0.0.0.0
-#configsvr=true 
-#replSet=rs0    
+#auth=true
+#replSet=rs0  
+#clusterAuthMode=keyFile
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file  
 maxConns=20000
 EOF
 chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
@@ -97,31 +99,43 @@ firewall-cmd --reload
 #4：客户端连接验证
 #/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongo
 ps aux |grep mongodb
-sleep 30
+sleep 10
 cd
 rm -rf $sourceinstall
 
-echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["root"]})' | mongo admin
+echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"}]})' | mongo admin
+
 # echo 'db.dropUser("admin")' | mongo admin
 sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
 systemctl restart mongodb.service 
 
 #cgexec -g memory:DBLimitedGroup 限制内存
-
-# 数据备份与恢复
-# mongodump --db learn --out backup
-# mongorestore --collection unicorns backup/learn/unicorns.bson
-
-# 导入导出
-# mongoexport --db learn --collection unicorns
-# mongoexport --db learn --collection unicorns --csv -fields name,weight,vampires
+#CentOS7 内存的设置方法为：systemctl set-property mongodb MemoryLimit=4G
 
 #sshpass -p Root123456 scp /home/redis_backup/* root@192.168.1.101:/home/redis_backup
 
-#CentOS7 内存的设置方法为：systemctl set-property mongodb MemoryLimit=4G
+#备份全库：mongodump -u username -p password -h 127.0.0.1:27017 -o db
+#备份单库：mongodump -u username -p password -h 127.0.0.1:27017 -d dbname -o db
+#备份集合：mongodump -u username -p password -h 127.0.0.1:27017 -d dbname -c collection -o db
 
+#恢复全库：mongorestore -u username -p password -h 127.0.0.1:27017 --dir=<directory-name>  
+#恢复单库：mongorestore -u username -p password -h 127.0.0.1:27017 -d dbname --dir=<directory-name>  
+#恢复集合：mongorestore -u username -p password -h 127.0.0.1:27017 -d dbname -c collection --dir=<directory-name>  
 
-#设置副本集集群  :>use admin 
+#设置副本集集群密码认证:
+#sed -i 's|#replSet=rs0 |replSet=rs0 |' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+
+#openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+#scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+#chown -R mongodb:mongodb /usr/local/mongodb
+#systemctl restart mongodb.service    
+#echo 'db.runCommand({"replSetInitiate":{"_id":"rs0","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},]}})' | mongo -u admin -p Adminqwe123 --port 27017 admin
+
+#>use admin 
 #>db.runCommand({"replSetInitiate":{"_id":"rs0","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},]}})
 #>rs.add("192.168.8.51:27017")
 #查看复制集状态:          >rs.status()        >rs.isMaster()        >rs.conf()
