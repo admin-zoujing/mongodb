@@ -1,10 +1,10 @@
 #!/bin/bash
-#安装centos7+mongodbcluster脚本 
+#安装centos7+mongodbshard脚本 
 #图形客户端下载地址：https://robomongo.org/download
 #http://www.runoob.com/mongodb
 
 
-#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:["root"]})' | mongo admin
+#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27017 admin
 # echo 'db.dropUser("admin")' | mongo admin
 #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
 #systemctl restart mongodb.service 
@@ -98,7 +98,7 @@ EOF
             systemctl daemon-reload 
             systemctl enable mongodbshard1.service 
             systemctl restart mongodbshard1.service 
-              
+                            
               sleep 30
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})' | mongo --port 27017 admin  
               
@@ -117,7 +117,7 @@ fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
 shardsvr=true
 replSet=shard2   
 maxConns=20000
@@ -192,8 +192,8 @@ EOF
             systemctl daemon-reload 
             systemctl enable mongodbconfigsvr.service 
             systemctl restart mongodbconfigsvr.service 
-
-            sleep 30
+           
+             sleep 30
              echo 'db.runCommand({"replSetInitiate":{"_id":"config","members":[{"_id":0,"host":"192.168.8.50:20000"},{"_id":1,"host":"192.168.8.51:20000"},{"_id":2,"host":"192.168.8.52:20000"},]}})' | mongo --port 20000 admin  
 
               #配置3台Route Process 
@@ -286,7 +286,7 @@ fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
 shardsvr=true
 replSet=shard1   
 maxConns=20000
@@ -314,7 +314,7 @@ EOF
             systemctl daemon-reload 
             systemctl enable mongodbshard1.service 
             systemctl restart mongodbshard1.service 
-
+              
               sleep 30
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})' | mongo --port 27017 admin  
               
@@ -333,7 +333,7 @@ fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
 shardsvr=true
 replSet=shard2   
 maxConns=20000
@@ -361,7 +361,7 @@ EOF
             systemctl daemon-reload 
             systemctl enable mongodbshard2.service 
             systemctl restart mongodbshard2.service 
-
+              
               sleep 30
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})' | mongo --port 27018 admin
               
@@ -532,7 +532,7 @@ EOF
             systemctl daemon-reload 
             systemctl enable mongodbshard1.service 
             systemctl restart mongodbshard1.service 
-
+             
               sleep 30
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})' | mongo --port 27017 admin    
               
@@ -579,7 +579,7 @@ EOF
             systemctl daemon-reload 
             systemctl enable mongodbshard2.service 
             systemctl restart mongodbshard2.service 
-
+             
               sleep 30
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})' | mongo --port 27018 admin
               
@@ -598,7 +598,7 @@ fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
 configsvr=true
 replSet=config   
 maxConns=20000
@@ -638,7 +638,7 @@ port=30000
 fork=true
 bind_ip=0.0.0.0
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
 configdb=config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000   
 maxConns=20000
 EOF
@@ -684,19 +684,19 @@ EOF
   #16.8 问题
   #      非正常关机后，重启无法后台运行，删除锁文件mongod.lock
   #      mongos启动卡死，后台启动2个进程，杀死一个就行。kill
-  #查看shard集群的当前状态：>sh.status()
+  #查看shard集群的当前状态：>sh.status()  >sh.help()
   #添加shard服务器至集群:>sh.addShard("config/192.168.8.53:27017")
 
   #16.9 集群分片需要密码认证
-#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27017 admin
-#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27018 admin
-#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 20000 admin
-
-
 #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
 #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
 #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
-#scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+#scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.52:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+
+#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27017 admin
+#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27018 admin
+#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 20000 admin
+#echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 30000 admin
 
 #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
 #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
@@ -712,7 +712,15 @@ EOF
 #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
 #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
 
-#systemctl restart mongodbshard1.service     
-#systemctl restart mongodbshard2.service 
-#systemctl restart mongodbconfigsvr.service
-#systemctl restart mongodbconfigdb.service 
+#关闭集群:路由结点、分片结点、配置结点顺序
+#systemctl stop mongodbconfigdb.service 
+#systemctl stop mongodbshard1.service     
+#systemctl stop mongodbshard2.service     
+#systemctl stop mongodbconfigsvr.service
+
+#重新启动集群
+#systemctl start mongodbconfigsvr.service
+#systemctl start mongodbshard1.service     
+#systemctl start mongodbshard2.service     
+#systemctl start mongodbconfigdb.service 
+
