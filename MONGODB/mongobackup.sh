@@ -2,7 +2,7 @@
 mkdir -pv /home/backup
 echo '#!/bin/bash
 # Enviroment
-export PATH=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin:$PATH
+export PATH=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin:$PATH
 
 # Configure The Directory of Backup
 BACKUPDIR=/home/backup
@@ -38,4 +38,4 @@ rm -rf $MTMPDIR
 ' > /home/backup/mongodb/mongobackup.sh
 chmod 744 /home/backup/mongobackup.sh
 
-echo '30 1 * * * root /home/backup/mongobackup.sh >/dev/null 2>&1' >> /etc/crontab
+echo '30 1 * * * root /home/backup/mongobackup.sh >/dev/null 2>&1' >> /etc/crontab  
