@@ -6,14 +6,14 @@
 
 #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27017 admin
 # echo 'db.dropUser("admin")' | mongo admin
-#sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+#sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/mongodb.conf
 #systemctl restart mongodb.service 
 
 systemctl stop mongodb.service 
 systemctl disable mongodb.service 
 rm -rf /usr/lib/systemd/system/mongodb.service
 systemctl daemon-reload 
-rm -rf /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/*
+rm -rf /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/*
 
 #3台服务器上各安装Shard,Config,Route服务
 #    主机              IP                 服务及端口
@@ -41,7 +41,7 @@ serverIP=`ifconfig|grep 'inet'|head -1|awk '{print $2}'|cut -d: -f2`
 
 
               #创建数据目录
-              mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_1,shard2_1,config,conf}
+              mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/{shard1_1,shard2_1,config,conf}
               chown -R mongodb:mongodb /usr/local/mongodb
 
               firewall-cmd --permanent --zone=public --add-port=27017/tcp --permanent
@@ -55,27 +55,27 @@ serverIP=`ifconfig|grep 'inet'|head -1|awk '{print $2}'|cut -d: -f2`
               firewall-cmd --reload
 
               #配置shard1所用到的Replica Sets 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_1
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1/shard1_1.log
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_1/shard1_1.log
 logappend=true
 port=27017
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
 shardsvr=true
 replSet=shard1   
 maxConns=20000
 EOF
 
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbshard1.service <<EOF
@@ -87,7 +87,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -103,26 +103,26 @@ EOF
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})' | mongo --port 27017 admin  
               
               #配置shard2所用到的Replica Sets 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_1
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_1
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_1/shard2_1.log 
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_1/shard2_1.log 
 logappend=true
 port=27018
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file 
 shardsvr=true
 replSet=shard2   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbshard2.service <<EOF
@@ -134,7 +134,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -150,26 +150,26 @@ EOF
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})' | mongo --port 27018 admin
 
 #配置Config Server
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config 
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config 
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log 
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config/config.log 
 logappend=true
 port=20000
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
 configsvr=true
 replSet=config   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbconfigsvr.service <<EOF
@@ -181,7 +181,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -197,18 +197,18 @@ EOF
              echo 'db.runCommand({"replSetInitiate":{"_id":"config","members":[{"_id":0,"host":"192.168.8.50:20000"},{"_id":1,"host":"192.168.8.51:20000"},{"_id":2,"host":"192.168.8.52:20000"},]}})' | mongo --port 20000 admin  
 
               #配置3台Route Process 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf <<EOF
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf <<EOF
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/mongos.log
 logappend=true
 port=30000
 fork=true
 bind_ip=0.0.0.0
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
 configdb=config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbconfigdb.service <<EOF
@@ -220,7 +220,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongos -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongos -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -258,7 +258,7 @@ EOF
             192.168.8.52 momgodbclusterC" >> /etc/hosts
 
               #创建数据目录
-              mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_2,shard2_2,config,conf}
+              mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/{shard1_2,shard2_2,config,conf}
               chown -R mongodb:mongodb /usr/local/mongodb
 
               firewall-cmd --permanent --zone=public --add-port=27017/tcp --permanent
@@ -272,26 +272,26 @@ EOF
               firewall-cmd --reload
 
               #配置shard1所用到的Replica Sets 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_2
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_2
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_2/shard1_2.log 
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_2/shard1_2.log 
 logappend=true
 port=27017
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file 
 shardsvr=true
 replSet=shard1   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbshard1.service <<EOF
@@ -303,7 +303,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -319,26 +319,26 @@ EOF
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})' | mongo --port 27017 admin  
               
               #配置shard2所用到的Replica Sets 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_2
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_2
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_2/shard2_2.log 
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_2/shard2_2.log 
 logappend=true
 port=27018
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file 
 shardsvr=true
 replSet=shard2   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbshard2.service <<EOF
@@ -350,7 +350,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -366,26 +366,26 @@ EOF
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})' | mongo --port 27018 admin
               
               #配置Config Server
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config 
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config 
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log 
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config/config.log 
 logappend=true
 port=20000
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
 configsvr=true
 replSet=config   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbconfigsvr.service <<EOF
@@ -397,7 +397,7 @@ Description=High-performance, schema-free document-oriented database
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -413,18 +413,18 @@ EOF
             echo 'db.runCommand({"replSetInitiate":{"_id":"config","members":[{"_id":0,"host":"192.168.8.50:20000"},{"_id":1,"host":"192.168.8.51:20000"},{"_id":2,"host":"192.168.8.52:20000"},]}})' | mongo --port 20000 admin  
              
               #配置3台Route Process 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf <<EOF
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf <<EOF
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/mongos.log
 logappend=true
 port=30000
 fork=true
 bind_ip=0.0.0.0
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
 configdb=config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbconfigdb.service <<EOF
@@ -436,7 +436,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongos -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongos -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -474,7 +474,7 @@ EOF
             192.168.8.52 momgodbclusterC" >> /etc/hosts
 
               #创建数据目录
-              mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_3,shard2_3,config,conf}
+              mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/{shard1_3,shard2_3,config,conf}
               chown -R mongodb:mongodb /usr/local/mongodb
 
               firewall-cmd --permanent --zone=public --add-port=27017/tcp --permanent
@@ -490,26 +490,26 @@ EOF
 
 
               #配置shard1所用到的Replica Sets 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_3
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_3
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_3/shard1_3.log 
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_3/shard1_3.log 
 logappend=true
 port=27017
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
 shardsvr=true
 replSet=shard1   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbshard1.service <<EOF
@@ -521,7 +521,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -537,26 +537,26 @@ EOF
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})' | mongo --port 27017 admin    
               
               #配置shard2所用到的Replica Sets 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_3
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_3
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_3/shard2_3.log 
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_3/shard2_3.log 
 logappend=true
 port=27018
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
 shardsvr=true
 replSet=shard2   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbshard2.service <<EOF
@@ -568,7 +568,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -584,26 +584,26 @@ EOF
               echo 'db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})' | mongo --port 27018 admin
               
               #配置Config Server
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf <<EOF
-dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config 
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf <<EOF
+dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config 
 journal=true
 directoryperdb=true
 wiredTigerDirectoryForIndexes=true
 wiredTigerCacheSizeGB=3
 #这个数字是你设置的(limit-1G)*0.5,最小1.5G。
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log 
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config/config.log 
 logappend=true
 port=20000
 fork=true
 bind_ip=0.0.0.0
 #auth=true
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file 
 configsvr=true
 replSet=config   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbconfigsvr.service <<EOF
@@ -615,7 +615,7 @@ Description=High-performance, schema-free document-oriented database
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -631,18 +631,18 @@ EOF
               echo 'db.runCommand({"replSetInitiate":{"_id":"config","members":[{"_id":0,"host":"192.168.8.50:20000"},{"_id":1,"host":"192.168.8.51:20000"},{"_id":2,"host":"192.168.8.52:20000"},]}})' | mongo --port 20000 admin    
 
               #配置3台Route Process 
-cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf <<EOF
-logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log
+cat > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf <<EOF
+logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/mongos.log
 logappend=true
 port=30000
 fork=true
 bind_ip=0.0.0.0
 #clusterAuthMode=keyFile
-#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file 
+#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file 
 configdb=config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000   
 maxConns=20000
 EOF
-             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+             chmod 755 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
              chown -R mongodb:mongodb /usr/local/mongodb
 
 cat > /usr/lib/systemd/system/mongodbconfigdb.service <<EOF
@@ -654,7 +654,7 @@ After=syslog.target network.target
 Group=mongodb
 User=mongodb
 Type=forking
-ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/bin/mongos -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+ExecStart=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongos -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
 LimitNOFILE=64000
 TimeoutStartSec=180
 PrivateTmp=true
@@ -688,29 +688,29 @@ EOF
   #添加shard服务器至集群:>sh.addShard("config/192.168.8.53:27017")
 
   #16.9 集群分片需要密码认证
-#openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
-#chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
-#scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
-#scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.52:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+#openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
+#chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
+#scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/
+#scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file root@192.168.8.52:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/
 
 #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27017 admin
 #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27018 admin
 #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 20000 admin
 #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 30000 admin
 
-#sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
-#sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
-#sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+#sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
+#sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
+#sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
 #chown -R mongodb:mongodb /usr/local/mongodb
-#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
-#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
-#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
-#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
+#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
+#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
+#sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
 
-#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
-#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
-#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
-#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
+#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
+#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
+#sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
 
 #关闭集群:路由结点、分片结点、配置结点顺序
 #systemctl stop mongodbconfigdb.service 
@@ -723,4 +723,5 @@ EOF
 #systemctl start mongodbshard1.service     
 #systemctl start mongodbshard2.service     
 #systemctl start mongodbconfigdb.service 
+
 
