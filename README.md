@@ -4,9 +4,9 @@ http://www.runoob.com/mongodb
 mongodb基本操作
 
 1、MongoDB 登录数据库：mongo  
-           关闭数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf --shutdown    
+           关闭数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/mongodb.conf --shutdown    
                        >use admin >db.shutdownServer()
-           开启数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+           开启数据库：mongod -f /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/mongodb.conf
 
 2、MongoDB 查询zoujing用户: >use admin   >db.system.users.find();
            创建zoujing用户: >use zoujing >db.createUser({user:"zoujing",pwd:"123456",roles:[{role:"dbOwner",db:"zoujing"}]});
@@ -138,14 +138,14 @@ db.col.find({"title":{$type:'string'}})
 
 13、MongoDB 复制（副本集）
     #设置副本集集群密码认证:
-    #sed -i 's|#replSet=rs0 |replSet=rs0 |' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
-    #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
-    #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/mongodb.conf
+    #sed -i 's|#replSet=rs0 |replSet=rs0 |' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/mongodb.conf
+    #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/mongodb.conf
+    #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/mongodb.conf
 
-    #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
-    #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
-    #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
-    #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+    #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
+    #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
+    #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/
+    #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/
     #chown -R mongodb:mongodb /usr/local/mongodb
     #systemctl restart mongodb.service    
     #echo 'db.runCommand({"replSetInitiate":{"_id":"rs0","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},]}})' | mongo -u admin -p Adminqwe123 --port 27017 admin
@@ -190,11 +190,11 @@ db.col.find({"title":{$type:'string'}})
                                      mongod config3:20000 
                                      mongs3:30000 
   #16.1 创建数据目录
-    Server A: mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_1,shard2_1,config}
+    Server A: mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/{shard1_1,shard2_1,config}
               chown -R root:root /usr/local/mongodb/
-    Server B: mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_2,shard2_2,config}
+    Server B: mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/{shard1_2,shard2_2,config}
               chown -R root:root /usr/local/mongodb/
-    Server C：mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/{shard1_3,shard2_3,config}
+    Server C：mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/{shard1_3,shard2_3,config}
               chown -R root:root /usr/local/mongodb/
 
               firewall-cmd --permanent --zone=public --add-port=27017/tcp --permanent
@@ -209,33 +209,33 @@ db.col.find({"title":{$type:'string'}})
 
 
   #16.2 配置shard1所用到的Replica Sets 
-    Server A: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_1/shard1_1.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
-    Server B: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_2 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_2/shard1_2.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
-    Server C：mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_3 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard1_3/shard1_3.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
+    Server A: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_1/shard1_1.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
+    Server B: mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_2 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_2/shard1_2.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
+    Server C：mongod --shardsvr --replSet shard1 --port 27017 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_3 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard1_3/shard1_3.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
 
      
      echo 'db.runCommand({"replSetInitiate":{"_id":"shard1","members":[{"_id":0,"host":"192.168.8.50:27017"},{"_id":1,"host":"192.168.8.51:27017"},{"_id":2,"host":"192.168.8.52:27017"},]}})' | mongo --port 27017 admin    
 
   #16.3 配置shard2所用到的Replica Sets 
-    Server A: mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_1/shard2_1.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
-    Server B: mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_2 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_2/shard2_2.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork  
-    Server C：mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_3 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/shard2_3/shard2_3.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork  
+    Server A: mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_1 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_1/shard2_1.log --logappend --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --bind_ip_all --fork  
+    Server B: mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_2 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_2/shard2_2.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork  
+    Server C：mongod --shardsvr --replSet shard2 --port 27018 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_3 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/shard2_3/shard2_3.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork  
 
 
     echo 'db.runCommand({"replSetInitiate":{"_id":"shard2","members":[{"_id":0,"host":"192.168.8.50:27018"},{"_id":1,"host":"192.168.8.51:27018"},{"_id":2,"host":"192.168.8.52:27018"},]}})' | mongo --port 27018 admin
 
   #16.4 配置3台Config Server
-    Server A: mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
-    Server B: mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
-    Server C：mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
+    Server A: mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
+    Server B: mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
+    Server C：mongod --configsvr --replSet config --port 20000 --dbpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/config/config.log --directoryperdb --wiredTigerDirectoryForIndexes --wiredTigerCacheSizeGB 16 --logappend --bind_ip_all --fork 
 
 
      echo 'db.runCommand({"replSetInitiate":{"_id":"config","members":[{"_id":0,"host":"192.168.8.50:20000"},{"_id":1,"host":"192.168.8.51:20000"},{"_id":2,"host":"192.168.8.52:20000"},]}})' | mongo --port 20000 admin    
 
   #16.5 配置3台Route Process 
-    Server A: mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log --logappend --bind_ip_all --fork 
-    Server B: mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log --logappend --bind_ip_all --fork 
-    Server C：mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/mongos.log --logappend --bind_ip_all --fork 
+    Server A: mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/mongos.log --logappend --bind_ip_all --fork 
+    Server B: mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/mongos.log --logappend --bind_ip_all --fork 
+    Server C：mongos --configdb config/192.168.8.50:20000,192.168.8.51:20000,192.168.8.52:20000 --port 30000 --logpath /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/mongos.log --logappend --bind_ip_all --fork 
 
   #16.6 配置Shard Cluster 
       echo 'db.runCommand({addshard:"shard1/192.168.8.50:27017,192.168.8.51:27017,192.168.8.52:27017"})' | mongo --port 30000 admin 
@@ -258,24 +258,24 @@ db.col.find({"title":{$type:'string'}})
         #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 27018 admin
         #echo 'db.createUser({user:"admin",pwd:"Adminqwe123",roles:[{role:"root",db:"admin"},{role:"clusterAdmin",db:"admin"}]})' | mongo --port 20000 admin
 
-        #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
-        #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file
-        #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
-        #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file root@192.168.8.52:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/
+        #openssl rand -base64 756 > /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
+        #chmod 400 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file
+        #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file root@192.168.8.51:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/
+        #scp -P22 /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file root@192.168.8.52:/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/
 
-        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
-        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
-        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
+        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
+        #sed -i 's|#auth=true|auth=true|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
         #chown -R mongodb:mongodb /usr/local/mongodb
-        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
-        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
-        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
-        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
+        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
+        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
+        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
+        #sed -i 's|#keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|keyFile=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/testKeyFile.file|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
 
-        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigdb.conf
-        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard1.conf
-        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbshard2.conf
-        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-3.6.9/data/conf/mongodbconfigsvr.conf
+        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigdb.conf
+        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard1.conf
+        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbshard2.conf
+        #sed -i 's|#clusterAuthMode=keyFile|clusterAuthMode=keyFile|' /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/conf/mongodbconfigsvr.conf
 
         #关闭集群:路由结点、分片结点、配置结点顺序
         #systemctl stop mongodbconfigdb.service 
@@ -397,6 +397,7 @@ Internal Role                   __system               集群中对任何数据�
                  clusterManager：授予管理和监控集群的权限
                  clusterMonitor：授予监控集群的权限，对监控工具具有readonly的权限
                  hostManager：管理Server
+
 
 
 
