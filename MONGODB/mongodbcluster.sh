@@ -723,5 +723,3 @@ EOF
 #systemctl start mongodbshard1.service     
 #systemctl start mongodbshard2.service     
 #systemctl start mongodbconfigdb.service 
-
-
