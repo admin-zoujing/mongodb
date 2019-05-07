@@ -27,7 +27,6 @@ tar -zxvf mongodb-linux-x86_64-rhel70-4.0.6.tgz -C /usr/local/mongodb
 mkdir -pv /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/{data,logs}
 chown -R mongodb:mongodb /usr/local/mongodb
 
-
 #2:configure配置安装
 #touch /usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/logs/mongodb.log
 #/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/bin/mongod --dbpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/data/ --logpath=/usr/local/mongodb/mongodb-linux-x86_64-rhel70-4.0.6/logs/mongodb.log --fork
@@ -158,8 +157,4 @@ systemctl restart mongodb.service
 #cp  mongodbback/config/local/oplog.rs.bson   mongodbback/oplog.bson
 #5进行恢复，添加之前找到的误删除的点（limt）
 #mongorestore -u admin -p Adminqwe123 --oplogReplay --oplogLimit "1553234987:1"  mongodbback
-
-
-
-
 
